@@ -14,12 +14,12 @@ void GetSavePath(char *buffer, size_t size) {
 
 // ---------------- Sleep ----------------
 void SleepMs(int ms) {
-    usleep(ms * 1000); // usleep takes microseconds
+    sleep(ms * 1000); // usleep takes microseconds
 }
 
 // ---------------- Case-insensitive string compare ----------------
-int StrCaseCmp(const char *a, const char *b) {
-    return strcasecmp(a, b); // POSIX
+int StrCaseCmp_Custom(const char *a, const char *b) {
+    return strcasecmp (a, b); // POSIX
 }
 
 // ---------------- Clear Console ----------------

@@ -18,7 +18,7 @@ void SleepMs(int ms) {
 }
 
 // ---------------- Case-insensitive string compare ----------------
-int StrCaseCmp(const char *a, const char *b) {
+int StrCaseCmp_Custom(const char *a, const char *b) {
     return _stricmp(a, b); // Windows-specific
 }
 

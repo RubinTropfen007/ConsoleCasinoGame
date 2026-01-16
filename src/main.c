@@ -21,12 +21,12 @@ typedef enum {
 
 // ----------------- Command Parser -----------------
 Command ParseCommand(const char *input) {
-    if (StrCaseCmp(input, "Betteln") == 0) return BETTELN;
-    if (StrCaseCmp(input, "Blackjack") == 0) return BLACKJACK;
-    if (StrCaseCmp(input, "Roulette") == 0) return ROULETTE;
-    if (StrCaseCmp(input, "Poker") == 0) return POKER;
-    if (StrCaseCmp(input, "Settings") == 0) return SETTINGS;
-    if (StrCaseCmp(input, "Exit") == 0) return EXIT;
+    if (StrCaseCmp_Custom(input, "Betteln") == 0) return BETTELN;
+    if (StrCaseCmp_Custom(input, "Blackjack") == 0) return BLACKJACK;
+    if (StrCaseCmp_Custom(input, "Roulette") == 0) return ROULETTE;
+    if (StrCaseCmp_Custom(input, "Poker") == 0) return POKER;
+    if (StrCaseCmp_Custom(input, "Settings") == 0) return SETTINGS;
+    if (StrCaseCmp_Custom(input, "Exit") == 0) return EXIT;
     return UNKNOWN;
 }
 

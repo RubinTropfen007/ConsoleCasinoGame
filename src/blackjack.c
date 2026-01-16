@@ -158,7 +158,7 @@ void BlackjackLoop(int64_t *konto) {
                 if (!fgets(action, sizeof(action), stdin)) break;
                 action[strcspn(action, "\n")] = 0;
 
-                if (StrCaseCmp(action, "Hit") == 0 || StrCaseCmp(action, "H") == 0) {
+                if (StrCaseCmp_Custom(action, "Hit") == 0 || StrCaseCmp_Custom(action, "H") == 0) {
                     ClearConsole();
                     SpielerHand[SpKartenAnzahl] = mainDeck[cursor++];
                     printf("Du hast gezogen: %s\n", SpielerHand[SpKartenAnzahl].name);
@@ -172,7 +172,7 @@ void BlackjackLoop(int64_t *konto) {
                     }
                 }
 
-                if (StrCaseCmp(action, "Stand") == 0 || StrCaseCmp(action, "S") == 0) {
+                if (StrCaseCmp_Custom(action, "Stand") == 0 || StrCaseCmp_Custom(action, "S") == 0) {
                     ClearConsole();
                     PlayerTurn = false;
                     DealerTurn = true;
@@ -250,7 +250,7 @@ void BlackjackLoop(int64_t *konto) {
             if (!fgets(choice, sizeof(choice), stdin)) break;
             choice[strcspn(choice, "\n")] = 0;
 
-            if (StrCaseCmp(choice, "n") == 0) {
+            if (StrCaseCmp_Custom(choice, "n") == 0) {
                 playingAtTable = false;
             }
         }
