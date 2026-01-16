@@ -8,6 +8,6 @@ void ShuffleDeck(Karte *deck, int gesamtAnzahl);
 
 Karte* GenerateDeck();
 
-void BlackjackLoop(long long *konto);
+void BlackjackLoop(int64_t *konto);
 
 #endif // BLACKJACK_H

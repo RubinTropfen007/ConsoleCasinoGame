@@ -36,7 +36,6 @@ int CalculateHandValue(Karte hand[], int length) {
     return sum;
 }
 
-// Shuffle a deck in-place
 void ShuffleDeck(Karte *deck, int total) {
     if (!deck || total <= 1) return;
 
@@ -48,7 +47,6 @@ void ShuffleDeck(Karte *deck, int total) {
     }
 }
 
-// Generate a deck (multiple decks combined)
 Karte* GenerateDeck(void) {
     int totalCards = DECK_SIZE * DECK_AMOUNT;
     Karte *deck = malloc(totalCards * sizeof(Karte));
@@ -108,11 +106,16 @@ void BlackjackLoop(int64_t *konto) {
         while (ChipsOnTable > 0) {
             int64_t Bet = 0;
             printf("\nChips am Tisch: %lld | Kontostand: %lld\n", ChipsOnTable, *konto);
-            printf("Einsatz: ");
+            printf("Einsatz (0 um auszusteigen): ");
             if (!fgets(line, sizeof(line), stdin)) break;
             Bet = atoll(line);
 
-            if (Bet > ChipsOnTable || Bet <= 0) {
+            if (Bet <= 0) {
+                *konto += ChipsOnTable;
+                break;
+            }
+
+            if (Bet > ChipsOnTable) {
                 printf("Ungültiger Einsatz!\n");
                 continue;
             }
@@ -181,9 +184,8 @@ void BlackjackLoop(int64_t *konto) {
             // ---------------- Dealer Turn ----------------
             if (DealerTurn) {
                 printf("Der Dealer deckt auf: %s\n", DealerHand[1].name);
-                SleepMs(2000);
                 printf("Dealer Hand: %d\n", DealerHandWert);
-                SleepMs(1000);
+                SleepMs(2000);
 
                 while (DealerTurn) {
                     printf("Dealer ist dran...\n");
@@ -242,13 +244,15 @@ void BlackjackLoop(int64_t *konto) {
         }
 
         // ---------------- Ask for new buy-in ----------------
-        char choice[8];
-        printf("\nKeine Chips mehr. Neue kaufen? (y/n): ");
-        if (!fgets(choice, sizeof(choice), stdin)) break;
-        choice[strcspn(choice, "\n")] = 0;
+        if (ChipsOnTable <= 0) {
+            char choice[8];
+            printf("\nKeine Chips mehr. Neue kaufen? (y/n): ");
+            if (!fgets(choice, sizeof(choice), stdin)) break;
+            choice[strcspn(choice, "\n")] = 0;
 
-        if (StrCaseCmp(choice, "n") == 0) {
-            playingAtTable = false;
+            if (StrCaseCmp(choice, "n") == 0) {
+                playingAtTable = false;
+            }
         }
     }
 
