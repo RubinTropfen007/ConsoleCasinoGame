@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <strings.h>
+#include <time.h>
 
 // ---------------- Save path ----------------
 void GetSavePath(char *buffer, size_t size) {
@@ -14,7 +16,7 @@ void GetSavePath(char *buffer, size_t size) {
 
 // ---------------- Sleep ----------------
 void SleepMs(int ms) {
-    usleep(ms * 1000);
+    sleep(ms / 1000);
 }
 
 // ---------------- Case-insensitive string compare ----------------
