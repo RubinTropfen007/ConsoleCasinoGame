@@ -14,7 +14,7 @@ void GetSavePath(char *buffer, size_t size) {
 
 // ---------------- Sleep ----------------
 void SleepMs(int ms) {
-    sleep(ms * 1000); // usleep takes microseconds
+    usleep(ms * 1000);
 }
 
 // ---------------- Case-insensitive string compare ----------------
