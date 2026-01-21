@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <locale.h>
+#include <strings.h>
 
 void InitTerminal(void) {
     setlocale(LC_ALL, "");
@@ -33,5 +34,3 @@ void ClearConsole(void) {
     printf("\x1b[2J\x1b[H");
     fflush(stdout); // ensure it updates immediately
 }
-
-char16
