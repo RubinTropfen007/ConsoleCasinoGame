@@ -33,11 +33,10 @@ Command ParseCommand(const char *input) {
 // ----------------- Menu -----------------
 int Menu(int64_t *konto) {
     char input[32];
-
     ClearConsole();
 
     printf("\nDein Guthaben: %lld$\n", *konto);
-    printf("Was mˆchtest du tun? (Betteln, Blackjack, Roulette, Poker, Settings, Exit)\n> ");
+    printf("Was m√∂chtest du tun? (Betteln, Blackjack, Roulette, Poker, Settings, Exit)\n> ");
 
     if (!fgets(input, sizeof(input), stdin)) return 0;
     input[strcspn(input, "\n")] = 0;  // remove newline
@@ -54,10 +53,10 @@ int Menu(int64_t *konto) {
             BlackjackLoop(konto);
             break;
         case EXIT:
-            printf("Bis zum n‰chsten Mal!\n");
+            printf("Bis zum n√§chsten Mal!\n");
             return 0;
         case UNKNOWN:
-            printf("Unbekannter Befehl! Bitte achte auf Groﬂ/Kleinschreibung.\n");
+            printf("Unbekannter Befehl! Bitte achte auf Gro√ü/Kleinschreibung.\n");
             break;
         default:
             printf("Dieses Spiel ist noch in der Entwicklung.\n");
@@ -75,7 +74,7 @@ void SaveGameBinary(int64_t konto) {
     if (file) {
         fwrite(&konto, sizeof(int64_t), 1, file);
         fclose(file);
-        printf("\n[System] Kontostand (%lld) bin‰r gesichert.\n", konto);
+        printf("\n[System] Kontostand (%lld) bin√§r gesichert.\n", konto);
     } else {
         printf("[System] Fehler beim Speichern!\n");
     }
@@ -97,12 +96,11 @@ int64_t LoadGameBinary() {
 
 // ----------------- Main -----------------
 int main(void) {
+    InitTerminal(); //Set Encoding to UTF-8
     srand((unsigned int)time(NULL));
     int64_t kontostand = LoadGameBinary();
     int returnCode = 1;
-
     printf("Willkommen zum Casino!\n");
-
     while (returnCode != 0) {
         returnCode = Menu(&kontostand);
     }

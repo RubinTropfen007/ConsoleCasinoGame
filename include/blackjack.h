@@ -2,11 +2,11 @@
 
 #ifndef BLACKJACK_H
 #define BLACKJACK_H
-int CalculateHandValue(Karte Hand[], int Laenge);
+int CalculateHandValue(PlayingCard Hand[], int Laenge);
 
-void ShuffleDeck(Karte *deck, int gesamtAnzahl);
+void ShuffleDeck(PlayingCard *deck, int gesamtAnzahl);
 
-Karte* GenerateDeck();
+PlayingCard* GenerateDeck();
 
 void BlackjackLoop(int64_t *konto);
 

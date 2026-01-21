@@ -4,6 +4,11 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <locale.h>
+
+void InitTerminal(void) {
+    setlocale(LC_ALL, "");
+}
 
 // ---------------- Save path ----------------
 void GetSavePath(char *buffer, size_t size) {
@@ -14,7 +19,7 @@ void GetSavePath(char *buffer, size_t size) {
 
 // ---------------- Sleep ----------------
 void SleepMs(int ms) {
-    usleep(ms * 1000);
+    sleep(ms / 1000);
 }
 
 // ---------------- Case-insensitive string compare ----------------
@@ -28,3 +33,5 @@ void ClearConsole(void) {
     printf("\x1b[2J\x1b[H");
     fflush(stdout); // ensure it updates immediately
 }
+
+char16

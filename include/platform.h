@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+void InitTerminal(void);
+
 // ---------------- OS-specific file paths ----------------
 
 // Returns the full path to the save file (e.g., AppData on Windows, $HOME on Unix)
