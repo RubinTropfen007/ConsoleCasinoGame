@@ -1,6 +1,9 @@
-Casino.cbp
-Casino.depend
-Casino.layout
-build/
+# Kompilate
+*.o
+*.so
 bin/
-*.kdev4
+build/
+
+# Betriebssystem-Müll
+.DS_Store
+Thumbs.db
