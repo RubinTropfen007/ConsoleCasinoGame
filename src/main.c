@@ -1,114 +1,102 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <stdint.h>
-#include <stdbool.h>
+#include <inttypes.h>
+#include <stdlib.h>
 #include <time.h>
+#include <dlfcn.h>
+#include <dirent.h>
+#include <string.h>
+#include <errno.h>
 
-#include "blackjack.h"
-#include "beg.h"
-#include "platform.h"
+#include "game.h"
 
-typedef enum {
-    UNKNOWN = -1,
-    EXIT = 0,
-    BETTELN,
-    BLACKJACK,
-    ROULETTE,
-    POKER,
-    SETTINGS
-} Command;
+#define MODULEDIR "../games"
 
-// ----------------- Command Parser -----------------
-Command ParseCommand(const char *input) {
-    if (StrCaseCmp_Custom(input, "Betteln") == 0) return BETTELN;
-    if (StrCaseCmp_Custom(input, "Blackjack") == 0) return BLACKJACK;
-    if (StrCaseCmp_Custom(input, "Roulette") == 0) return ROULETTE;
-    if (StrCaseCmp_Custom(input, "Poker") == 0) return POKER;
-    if (StrCaseCmp_Custom(input, "Settings") == 0) return SETTINGS;
-    if (StrCaseCmp_Custom(input, "Exit") == 0) return EXIT;
-    return UNKNOWN;
+const char *getfileextension(const char *filename) {
+    const char *dot = strchr(filename, '.');
+    if (!dot || dot == filename) return "";
+    return dot;
 }
 
-// ----------------- Menu -----------------
-int Menu(int64_t *konto) {
-    char input[32];
+static int prompt_number(const char *prompt, int min, int max) {
+    char buf[32];
 
-    ClearConsole();
+    while (1) {
+        printf("%s", prompt);
+        if (!fgets(buf, sizeof(buf), stdin)) {
+            return min;
+        }
 
-    printf("\nDein Guthaben: %lld$\n", *konto);
-    printf("Was mˆchtest du tun? (Betteln, Blackjack, Roulette, Poker, Settings, Exit)\n> ");
+        int value = (int)strtol(buf, NULL, 10);
+        if (value < min || value > max) {
+            printf("Please enter a number between %d and %d.\n", min, max);
+            continue;
+        }
 
-    if (!fgets(input, sizeof(input), stdin)) return 0;
-    input[strcspn(input, "\n")] = 0;  // remove newline
-
-    Command cmd = ParseCommand(input);
-
-    switch (cmd) {
-        case BETTELN:
-            ClearConsole();
-            Beg(konto);
-            break;
-        case BLACKJACK:
-            ClearConsole();
-            BlackjackLoop(konto);
-            break;
-        case EXIT:
-            printf("Bis zum n‰chsten Mal!\n");
-            return 0;
-        case UNKNOWN:
-            printf("Unbekannter Befehl! Bitte achte auf Groﬂ/Kleinschreibung.\n");
-            break;
-        default:
-            printf("Dieses Spiel ist noch in der Entwicklung.\n");
-            break;
-    }
-    return 1;
-}
-
-// ----------------- Save / Load -----------------
-void SaveGameBinary(int64_t konto) {
-    char path[512];
-    GetSavePath(path, sizeof(path));
-
-    FILE *file = fopen(path, "wb");
-    if (file) {
-        fwrite(&konto, sizeof(int64_t), 1, file);
-        fclose(file);
-        printf("\n[System] Kontostand (%lld) bin‰r gesichert.\n", konto);
-    } else {
-        printf("[System] Fehler beim Speichern!\n");
+        return value;
     }
 }
 
-int64_t LoadGameBinary() {
-    char path[512];
-    GetSavePath(path, sizeof(path));
+// Die Signatur muss const Game *all_games[] sein
+void LoadModules(const Game *all_games[], int *game_total_count) {
+    DIR *dirp = opendir(MODULEDIR);
+    struct dirent *dp;
 
-    FILE *file = fopen(path, "rb");
-    int64_t loaded = 1000LL;  // default starting balance
-
-    if (file) {
-        fread(&loaded, sizeof(int64_t), 1, file);
-        fclose(file);
+    if (!dirp) {
+        perror("Failed to open Module directory");
+        exit(EXIT_FAILURE);
     }
-    return loaded;
+
+    while ((dp = readdir(dirp)) != NULL) {
+        if (strcmp(getfileextension(dp->d_name), ".so") == 0) {
+            char fullpath[512];
+            snprintf(fullpath, sizeof(fullpath), "%s/%s", MODULEDIR, dp->d_name);
+
+            void *handle = dlopen(fullpath, RTLD_NOW);
+            if (!handle) {
+                fprintf(stderr, "dlopen failed: %s\n", dlerror());
+                continue;
+            }
+
+            typedef const Game* (*GameGetFn)();
+            GameGetFn get_all = (GameGetFn) dlsym(handle, "game_get_all");
+
+            if (get_all) {
+                const Game *module_games = get_all();
+                
+                if (module_games && *game_total_count < 128) {
+                    // Jetzt passt der Typ: Zeiger auf Zeiger
+                    all_games[*game_total_count] = module_games;
+                    
+                    printf("Loaded: %s (from %s)\n", all_games[*game_total_count]->name, dp->d_name);
+                    
+                    // Hier pr√ºfen wir den Wert, auf den der Zeiger zeigt
+                    if (*game_total_count > 0) {
+                        printf("Previous game was: %s\n", all_games[*game_total_count - 1]->name);
+                    }
+                    
+                    // WICHTIG: Den Wert hinter dem Zeiger erh√∂hen
+                    (*game_total_count)++;
+                }
+            }
+        }
+    }
+    closedir(dirp);
+    // Hier auch dereferenzieren f√ºr das printf
+    printf("Total of %d games were loaded.\n", *game_total_count);
 }
 
-// ----------------- Main -----------------
 int main(void) {
+    const Game *all_games[128]; 
+    int game_total_count = 0;
+
+    LoadModules(all_games, &game_total_count);
     srand((unsigned int)time(NULL));
-    int64_t kontostand = LoadGameBinary();
-    int returnCode = 1;
 
-    printf("Willkommen zum Casino!\n");
+    uint64_t balance = 1000;
+    size_t game_count = 0;
+    const Game *games/* = game_get_all(&game_count)*/;
 
-    while (returnCode != 0) {
-        returnCode = Menu(&kontostand);
-    }
-
-    // Save the game
-    SaveGameBinary(kontostand);
-
-    return returnCode;
+    printf("Goodbye!\n");
+    return 0;
 }
