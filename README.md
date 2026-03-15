@@ -1,6 +1,1 @@
-My Casino Game running on C, currently on works on a Console, if it's feasible i might add UI to it...
-As of right now only Blackjack is fully functional, working on Poker with Multiplayer, so might be a while until an update is thrown out...
-
-I am a newbie to programming. This is just for me to learn and understand the Language and Programming concepts in general.
-
-You should be able to build this on Windows AND on Linux.
+This Engine or Framework or whatever you want to call it Loads Games from their respective .so files and lets the player choose between. you could essentially just run anything on these Modules but intended is for different Games you may find in a Casino, i will be creating Poker, Blackjack and Roulette when i feel like it.
